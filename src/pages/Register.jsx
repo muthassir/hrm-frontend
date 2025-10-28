@@ -12,17 +12,21 @@ const Register = () => {
   const [role, setRole] = useState("employee");
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccessMsg("");
+    setLoading(true);
     try {
       await register(name, email, password, role);
       setSuccessMsg("Registration successful! Redirecting to login...");
       setTimeout(() => navigate("/"), 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,13 +36,25 @@ const Register = () => {
         <div className="mx-auto max-w-md">
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body p-6 sm:p-8 bg-white">
-              <h2 className="card-title justify-center text-2xl font-semibold mb-2 text-primary">Register</h2>
+              <h2 className="card-title justify-center text-2xl font-semibold mb-2 text-primary">
+                Register
+              </h2>
 
               {error && (
                 <div className="alert alert-error shadow-lg mb-4">
                   <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="stroke-current flex-shrink-0 h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
+                      />
                     </svg>
                     <span>{error}</span>
                   </div>
@@ -48,8 +64,18 @@ const Register = () => {
               {successMsg && (
                 <div className="alert alert-success shadow-lg mb-4">
                   <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="stroke-current flex-shrink-0 h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                     <span>{successMsg}</span>
                   </div>
@@ -68,6 +94,7 @@ const Register = () => {
                     placeholder="username"
                     onChange={(e) => setName(e.target.value)}
                     required
+                    disabled={loading}
                   />
                 </div>
 
@@ -82,6 +109,7 @@ const Register = () => {
                     placeholder="email"
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={loading}
                   />
                 </div>
 
@@ -96,6 +124,7 @@ const Register = () => {
                     placeholder="password"
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={loading}
                   />
                 </div>
 
@@ -107,6 +136,7 @@ const Register = () => {
                     className="select select-neutral mt-2 bg-white w-full"
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
+                    disabled={loading}
                   >
                     <option value="employee">Employee</option>
                     <option value="admin">Admin</option>
@@ -116,16 +146,20 @@ const Register = () => {
                 <div className="form-control mt-4">
                   <button
                     type="submit"
-                    className="btn btn-primary w-full"
+                    className={`btn btn-primary w-full ${loading ? "loading" : ""}`}
+                    disabled={loading}
                   >
-                    Register
+                    {loading ? "Registering..." : "Register"}
                   </button>
                 </div>
               </form>
 
               <div className="mt-4 text-center text-sm text-neutral-content">
                 <Link to="/">
-                  <p className="text-neutral">Already have an account? <span className="link link-primary">Login</span></p>
+                  <p className="text-neutral">
+                    Already have an account?{" "}
+                    <span className="link link-primary">Login</span>
+                  </p>
                 </Link>
               </div>
 

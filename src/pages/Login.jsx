@@ -9,29 +9,33 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
     try {
       await login(email, password);
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-screen absolute top-0 z-10 flex items-center justify-center bg-base-200 text-neutral ">
+    <div className="min-h-screen w-screen absolute top-0 z-10 flex items-center justify-center bg-base-200 text-neutral">
       <div className="container px-4">
         <div className="mx-auto max-w-md">
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body p-6 sm:p-8 bg-white">
-              <h2 className="card-title justify-center text-2xl font-semibold mb-2 text-primary">Login</h2>
+              <h2 className="card-title justify-center text-2xl font-semibold mb-2 text-primary">
+                Login
+              </h2>
 
-              {error && (
-                <Alert error={error} />
-              )}
+              {error && <Alert error={error} />}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="form-control">
@@ -45,6 +49,7 @@ const Login = () => {
                     placeholder="email"
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={loading}
                   />
                 </div>
 
@@ -59,25 +64,29 @@ const Login = () => {
                     placeholder="password"
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={loading}
                   />
                 </div>
 
                 <div className="form-control mt-4">
                   <button
                     type="submit"
-                    className="btn btn-primary w-full"
+                    className={`btn btn-primary w-full ${loading ? "loading" : ""}`}
+                    disabled={loading}
                   >
-                    Login
+                    {loading ? "Logging in..." : "Login"}
                   </button>
                 </div>
               </form>
 
               <div className="mt-4 text-center text-sm text-neutral-content">
-                <Link to ="/register">
-                                <p className="text-neutral">Don't have an account? <span className="link link-primary">Register</span></p>
+                <Link to="/register">
+                  <p className="text-neutral">
+                    Don't have an account?{" "}
+                    <span className="link link-primary">Register</span>
+                  </p>
                 </Link>
               </div>
-
             </div>
           </div>
         </div>
