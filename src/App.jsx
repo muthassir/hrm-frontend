@@ -11,19 +11,16 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PublicDashboard from "./pages/PublicDashboard"
 
-// Protected route 
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
   if (role && user.role !== role) return <Navigate to="/dashboard" replace />;
   return children;
 };
 
-// public route - FIXED
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
   
-  // If user is logged in, redirect to dashboard from auth pages
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -31,11 +28,9 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// Add this new component for public dashboard with redirect
 const PublicDashboardRoute = ({ children }) => {
   const { user } = useAuth();
   
-  // If user is logged in, redirect to dashboard
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -51,14 +46,12 @@ const App = () => {
           <Header />
           <main className="flex-1">
             <Routes>
-              {/* Public dashboard - redirect to dashboard if user is logged in */}
               <Route path="/" element={
                 <PublicDashboardRoute>
                   <PublicDashboard />
                 </PublicDashboardRoute>
               } />
               
-              {/* Auth pages - redirect to dashboard if already logged in */}
               <Route path="/login" element={
                 <PublicRoute>
                   <Login />
@@ -70,7 +63,6 @@ const App = () => {
                 </PublicRoute>
               } />
 
-              {/* Protected routes */}
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -87,7 +79,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
