@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Alert from "../components/Alert";
 
 const Register = () => {
   const { register } = useAuth();
@@ -34,6 +35,9 @@ const Register = () => {
     <div className="min-h-screen w-screen absolute top-0 z-10 flex items-center justify-center bg-base-200 text-neutral">
       <div className="container px-4">
         <div className="mx-auto max-w-md">
+             <h1 className="text-3xl text-primary font-bold m-2 text-center"> HRM </h1>
+            <h1 className=" text-white font-bold m-6 text-center">Manage employees, attendance, and more.
+</h1>
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body p-6 sm:p-8 bg-white">
               <h2 className="card-title justify-center text-2xl font-semibold mb-2 text-primary">
@@ -41,24 +45,7 @@ const Register = () => {
               </h2>
 
               {error && (
-                <div className="alert alert-error shadow-lg mb-4">
-                  <div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="stroke-current flex-shrink-0 h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
-                      />
-                    </svg>
-                    <span>{error}</span>
-                  </div>
-                </div>
+              <Alert error={error} /> 
               )}
 
               {successMsg && (

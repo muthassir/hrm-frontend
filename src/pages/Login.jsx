@@ -29,6 +29,9 @@ const Login = () => {
     <div className="min-h-screen w-screen absolute top-0 z-10 flex items-center justify-center bg-base-200 text-neutral">
       <div className="container px-4">
         <div className="mx-auto max-w-md">
+          <h1 className="text-3xl text-primary font-bold m-2 text-center"> HRM </h1>
+            <h1 className=" text-white font-bold m-6 text-center">Manage employees, attendance, and more.
+</h1>
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body p-6 sm:p-8 bg-white">
               <h2 className="card-title justify-center text-2xl font-semibold mb-2 text-primary">
