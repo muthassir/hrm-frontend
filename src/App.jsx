@@ -14,22 +14,35 @@ import PublicDashboard from "./pages/PublicDashboard"
 // Protected route 
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   if (role && user.role !== role) return <Navigate to="/dashboard" replace />;
   return children;
 };
 
-// public route
+// public route - FIXED
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
-  if (user && window.location.pathname === '/') {
+  
+  // If user is logged in, redirect to dashboard from auth pages
+  if (user) {
     return <Navigate to="/dashboard" replace />;
   }
-  if (user && (window.location.pathname === '/login' || window.location.pathname === '/register')) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  
   return children;
 };
+
+// Add this new component for public dashboard with redirect
+const PublicDashboardRoute = ({ children }) => {
+  const { user } = useAuth();
+  
+  // If user is logged in, redirect to dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
+
 const App = () => {
   return (
     <AuthProvider>
@@ -38,47 +51,41 @@ const App = () => {
           <Header />
           <main className="flex-1">
             <Routes>
-              {/* Public routes */}
-             
-                <Route path="/" element={<PublicDashboard />} />
-  <Route path="/login" element={
-    <PublicRoute>
-      <Login />
-    </PublicRoute>
-  } />
-  <Route path="/register" element={
-    <PublicRoute>
-      <Register />
-    </PublicRoute>
-  } />
+              {/* Public dashboard - redirect to dashboard if user is logged in */}
+              <Route path="/" element={
+                <PublicDashboardRoute>
+                  <PublicDashboard />
+                </PublicDashboardRoute>
+              } />
+              
+              {/* Auth pages - redirect to dashboard if already logged in */}
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } />
+              <Route path="/register" element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } />
 
-              {/* Admin/Employee routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Admin */}
-              <Route
-                path="/employees"
-                element={
-                  <ProtectedRoute role="admin">
-                    <EmployeeManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/office-location"
-                element={
-                  <ProtectedRoute role="admin">
-                    <OfficeLocation />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Protected routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/employees" element={
+                <ProtectedRoute role="admin">
+                  <EmployeeManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/office-location" element={
+                <ProtectedRoute role="admin">
+                  <OfficeLocation />
+                </ProtectedRoute>
+              } />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
@@ -92,4 +99,3 @@ const App = () => {
 };
 
 export default App;
-
