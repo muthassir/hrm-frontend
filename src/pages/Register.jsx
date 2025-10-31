@@ -10,7 +10,7 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("employee");
+  const [role, setRole] = useState("admin");
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false)
@@ -20,10 +20,11 @@ const Register = () => {
     setError("");
     setSuccessMsg("");
     setLoading(true);
+    setRole("admin")
     try {
       await register(name, email, password, role);
       setSuccessMsg("Registration successful! Redirecting to login...");
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -115,21 +116,6 @@ const Register = () => {
                   />
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Role</span>
-                  </label>
-                  <select
-                    className="select select-neutral mt-2 bg-white w-full"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    disabled={loading}
-                  >
-                    <option value="employee">Employee</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-
                 <div className="form-control mt-4">
                   <button
                     type="submit"
@@ -142,7 +128,7 @@ const Register = () => {
               </form>
 
               <div className="mt-4 text-center text-sm text-neutral-content">
-                <Link to="/">
+                <Link to="/login">
                   <p className="text-neutral">
                     Already have an account?{" "}
                     <span className="link link-primary">Login</span>

@@ -9,6 +9,7 @@ import EmployeeManagement from "./pages/EmployeeManagement";
 import OfficeLocation from "./pages/OfficeLocation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import PublicDashboard from "./pages/PublicDashboard"
 
 // Protected route 
 const ProtectedRoute = ({ children, role }) => {
@@ -21,10 +22,14 @@ const ProtectedRoute = ({ children, role }) => {
 // public route
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (user && window.location.pathname === '/') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  if (user && (window.location.pathname === '/login' || window.location.pathname === '/register')) {
+    return <Navigate to="/dashboard" replace />;
+  }
   return children;
 };
-
 const App = () => {
   return (
     <AuthProvider>
@@ -34,22 +39,18 @@ const App = () => {
           <main className="flex-1">
             <Routes>
               {/* Public routes */}
-              <Route
-                path="/"
-                element={
-                  <PublicRoute>
-                    <Login />
-                  </PublicRoute>
-                }
-              />
-              <Route
-                path="/register"
-                element={
-                  <PublicRoute>
-                    <Register />
-                  </PublicRoute>
-                }
-              />
+             
+                <Route path="/" element={<PublicDashboard />} />
+  <Route path="/login" element={
+    <PublicRoute>
+      <Login />
+    </PublicRoute>
+  } />
+  <Route path="/register" element={
+    <PublicRoute>
+      <Register />
+    </PublicRoute>
+  } />
 
               {/* Admin/Employee routes */}
               <Route

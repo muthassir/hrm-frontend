@@ -30,35 +30,51 @@ const Header = () => {
             tabIndex="-1"
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
-            {user && (
+            {user ? (
               <>
-               {
-                user.role === "admin" && (
-                   <li>
-                  <Link to="/dashboard">Dashboard</Link>
-                  <Link to="/employees">Employees</Link>
-                  <Link to="/office-location">Office Location</Link>
-                </li>)
-               }
+                {user.role === "admin" && (
+                  <li>
+                    <Link to="/dashboard">Dashboard</Link>
+                    <Link to="/employees">Employees</Link>
+                    <Link to="/office-location">Office Location</Link>
+                  </li>
+                )}
                 {user.role === "employee" && (
                   <li>
                     <Link to="/dashboard">Attendance</Link>
                   </li>
                 )}
               </>
+            ) : (
+              // public menu
+              <li>
+                <Link to="/">Home</Link>
+                <Link to="/login">Login</Link>
+                <Link to="/register">Register</Link>
+              </li>
             )}
           </ul>
         </div>
       </div>
 
       <div className="navbar-center">
-        <Link to="/dashboard" className="btn btn-ghost text-xl text-primary">
+        <Link 
+          to={user ? "/dashboard" : "/"} 
+          className="btn btn-ghost text-xl text-primary"
+        >
           HRM App
         </Link>
       </div>
 
       <div className="navbar-end flex items-center gap-2">
-       <Modal />
+        {user ? (
+          <Modal />
+        ) : (
+          <div className="flex gap-2">
+            <Link to="/login" className="btn btn-ghost">Login</Link>
+            <Link to="/register" className="btn btn-primary">Register</Link>
+          </div>
+        )}
       </div>
     </header>
   );
