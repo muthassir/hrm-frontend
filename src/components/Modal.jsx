@@ -16,15 +16,18 @@ const Modal = () => {
 
       <dialog id="my_modal_1" className="modal text-primary">
         <div className="modal-box bg-white">
-          <h3 className="font-bold text-lg">Hello!</h3>
+          <h3 className="font-bold text-lg">Profile</h3>
           <div className="py-4 flex flex-col gap-2">
             {user && (
           <>
             <span className="text-gray-700">
-              Hello, {user.name}
+              Username: {user.name}
             </span>
-             <span className="text-gray-700 ">
+             <span className="text-gray-700">
               Mail: {user.email}
+            </span>
+            <span className="text-gray-700">
+              Role: {user.role}
             </span>
            <form method="dialog">
              <button
