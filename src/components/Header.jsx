@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Modal from "./Modal";
@@ -36,12 +35,13 @@ const Header = () => {
                   <li>
                     <Link to="/dashboard">Dashboard</Link>
                     <Link to="/employees">Employees</Link>
-                    <Link to="/office-location">Office Location</Link>
+                    <Link to="/leave-management">Leave Management</Link>
                   </li>
                 )}
                 {user.role === "employee" && (
                   <li>
                     <Link to="/dashboard">Attendance</Link>
+                    <Link to="/leave">Apply Leave</Link>
                   </li>
                 )}
               </>
@@ -58,11 +58,11 @@ const Header = () => {
       </div>
 
       <div className="navbar-center">
-        <Link 
-          to={user ? "/dashboard" : "/"} 
+        <Link
+          to={user ? "/dashboard" : "/"}
           className="btn btn-ghost text-xl text-primary"
         >
-          HRM App
+          EMS App
         </Link>
       </div>
 
@@ -71,8 +71,12 @@ const Header = () => {
           <Modal />
         ) : (
           <div className="flex gap-2">
-            <Link to="/login" className="btn btn-ghost">Login</Link>
-            <Link to="/register" className="btn btn-primary">Register</Link>
+            <Link to="/login" className="btn btn-ghost">
+              Login
+            </Link>
+            <Link to="/register" className="btn btn-primary">
+              Register
+            </Link>
           </div>
         )}
       </div>

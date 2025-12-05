@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const Attendance = () => {
@@ -6,11 +6,18 @@ const Attendance = () => {
   const [attendance, setAttendance] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
-  const fetchMyAttendance = async () => {
+  const fetchMyAttendance = async (page = 1) => {
     try {
-      const res = await axiosAuth.get(`${API}/api/attendance/me`);
+      const res = await axiosAuth.get(
+        `${API}/api/attendance/me?page=${page}&limit=${limit}`
+      );
       setAttendance(res.data.data.items);
+      setTotalPages(Math.ceil(res.data.data.total / limit));
+      setCurrentPage(res.data.data.page);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch attendance");
     }
@@ -22,90 +29,146 @@ const Attendance = () => {
 
   const handleCheck = async (type) => {
     setError("");
-    if (!navigator.geolocation) {
-      setError("Geolocation not supported by your browser");
-      return;
+    try {
+      setLoading(true);
+      const res = await axiosAuth.post(`${API}/api/attendance/${type}`);
+      fetchMyAttendance(currentPage);
+      alert(`${type === 'checkin' ? 'Check-in' : 'Check-out'} successful!`);
+    } catch (err) {
+      setError(err.response?.data?.message || "Attendance failed");
+    } finally {
+      setLoading(false);
     }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          setLoading(true);
-          const res = await axiosAuth.post(`${API}/api/attendance/${type}`, {
-            lat: latitude,
-            lng: longitude,
-          });
-          fetchMyAttendance();
-          alert(`${type} successful! Distance: ${res.data.data.distance.toFixed(2)}m, Within Radius: ${res.data.data.withinRadius}`);
-        } catch (err) {
-          setError(err.response?.data?.message || "Attendance failed");
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        setError("Permission denied or unable to get location");
-      }
-    );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-6 text-neutral flex flex-col items-center">
+    <div className="min-h-screen p-6 text-primary">
       <h1 className="text-3xl font-bold mb-6 text-primary">My Attendance</h1>
 
-      {error && <div className="mb-4 text-red-600">{error}</div>}
+      {error && (
+        <div className="alert alert-error mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
 
-      <div className="flex flex-wrap gap-4 mb-6">
-        <button
-          onClick={() => handleCheck("checkin")}
-          className="btn bg-primary text-white border-none hover:bg-primary/90 transition rounded-lg px-6 py-2 disabled:opacity-70"
-          disabled={loading}
-        >
-          Check In
-        </button>
-        <button
-          onClick={() => handleCheck("checkout")}
-          className="btn bg-red-600 text-white border-none hover:bg-red-700 transition rounded-lg px-6 py-2 disabled:opacity-70"
-          disabled={loading}
-        >
-          Check Out
-        </button>
+      {/* Check-in/Check-out Buttons */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4 text-primary">Today's Attendance</h2>
+        <div className="flex flex-wrap gap-4">
+          <button
+            onClick={() => handleCheck("checkin")}
+            className="btn btn-primary btn-lg"
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Check In"}
+          </button>
+          <button
+            onClick={() => handleCheck("checkout")}
+            className="btn btn-secondary btn-lg"
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Check Out"}
+          </button>
+        </div>
+        <p className="text-sm text-gray-500 mt-2">
+          Note: You can only check in once and check out once per day.
+        </p>
       </div>
 
-      <div className="bg-white shadow-md border border-primary/20 rounded-lg p-4">
-        <h2 className="text-xl font-semibold mb-2 text-primary">Attendance Records</h2>
-        {attendance.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="table w-full border-collapse">
-              <thead className="bg-primary text-white">
-                <tr>
-                  <th className="border px-2 py-1">Date</th>
-                  <th className="border px-2 py-1">Check In</th>
-                  <th className="border px-2 py-1">Check Out</th>
-                  <th className="border px-2 py-1">Within Radius</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendance.map((att) => (
-                  <tr key={att._id} className="hover:bg-primary/10 transition">
-                    <td className="border px-2 py-1">{att.date}</td>
-                    <td className="border px-2 py-1">
-                      {att.checkIn?.time ? new Date(att.checkIn.time).toLocaleTimeString() : "-"}
-                    </td>
-                    <td className="border px-2 py-1">
-                      {att.checkOut?.time ? new Date(att.checkOut.time).toLocaleTimeString() : "-"}
-                    </td>
-                    <td className="border px-2 py-1">
-                      {att.checkIn?.withinRadius && att.checkOut?.withinRadius ? "Yes" : "No"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Attendance History */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-primary">Attendance History</h2>
+          <div className="text-sm text-gray-500">
+            Page {currentPage} of {totalPages}
+          </div>
+        </div>
+
+        {attendance.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No attendance records found.
           </div>
         ) : (
-          <p className="text-gray-600 mt-3">No attendance records found.</p>
+          <>
+            <div className="overflow-x-auto">
+              <table className="table table-zebra w-full">
+                <thead>
+                  <tr className="bg-primary text-primary-content">
+                    <th>Date</th>
+                    <th>Check In Time</th>
+                    <th>Check Out Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attendance.map((att) => (
+                    <tr key={att._id}>
+                      <td className="font-medium">{att.date}</td>
+                      <td>
+                        {att.checkIn?.time ? (
+                          new Date(att.checkIn.time).toLocaleTimeString()
+                        ) : (
+                          <span className="text-gray-400">Not checked in</span>
+                        )}
+                      </td>
+                      <td>
+                        {att.checkOut?.time ? (
+                          new Date(att.checkOut.time).toLocaleTimeString()
+                        ) : (
+                          <span className="text-gray-400">Not checked out</span>
+                        )}
+                      </td>
+                      <td>
+                        {att.checkIn?.time && att.checkOut?.time ? (
+                          <span className="badge badge-success">Completed</span>
+                        ) : att.checkIn?.time ? (
+                          <span className="badge badge-warning">Checked in</span>
+                        ) : (
+                          <span className="badge badge-error">Absent</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <div className="join">
+                  <button
+                    className="join-item btn"
+                    onClick={() => {
+                      const prevPage = Math.max(1, currentPage - 1);
+                      setCurrentPage(prevPage);
+                      fetchMyAttendance(prevPage);
+                    }}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                  <button className="join-item btn">
+                    Page {currentPage} of {totalPages}
+                  </button>
+                  <button
+                    className="join-item btn"
+                    onClick={() => {
+                      const nextPage = Math.min(totalPages, currentPage + 1);
+                      setCurrentPage(nextPage);
+                      fetchMyAttendance(nextPage);
+                    }}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

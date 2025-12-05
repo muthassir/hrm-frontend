@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -6,36 +5,22 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Dashboard from "./pages/Dashboard";
 import EmployeeManagement from "./pages/EmployeeManagement";
-import OfficeLocation from "./pages/OfficeLocation";
-import Login from "./pages/Login";
-
-import Register from "./pages/Register";
-import PublicDashboard from "./pages/PublicDashboard"
+import LeaveApplication from "./pages/LeaveApplication"
+import LeaveManagement from "./pages/LeaveManagement"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
+import PublicDashboard from "./pages/PublicDashboard";
 
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/" replace />
   if (role && user.role !== role) return <Navigate to="/dashboard" replace />;
   return children;
 };
 
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
-  
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  
-  return children;
-};
-
-const PublicDashboardRoute = ({ children }) => {
-  const { user } = useAuth();
-  
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  
+  if (user) return <Navigate to="/dashboard" replace />;
   return children;
 };
 
@@ -48,9 +33,9 @@ const App = () => {
           <main className="flex-1">
             <Routes>
               <Route path="/" element={
-                <PublicDashboardRoute>
+                <PublicRoute>
                   <PublicDashboard />
-                </PublicDashboardRoute>
+                </PublicRoute>
               } />
               
               <Route path="/login" element={
@@ -69,14 +54,22 @@ const App = () => {
                   <Dashboard />
                 </ProtectedRoute>
               } />
+              
               <Route path="/employees" element={
                 <ProtectedRoute role="admin">
                   <EmployeeManagement />
                 </ProtectedRoute>
               } />
-              <Route path="/office-location" element={
+              
+              <Route path="/leave" element={
+                <ProtectedRoute>
+                  <LeaveApplication />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/leave-management" element={
                 <ProtectedRoute role="admin">
-                  <OfficeLocation />
+                  <LeaveManagement />
                 </ProtectedRoute>
               } />
 
