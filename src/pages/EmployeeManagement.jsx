@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const EmployeeManagement = () => {
@@ -95,7 +95,6 @@ const EmployeeManagement = () => {
       setShowForm(false);
       fetchEmployees(currentPage);
       
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save employee");
@@ -146,7 +145,7 @@ const EmployeeManagement = () => {
     setSuccess("");
   };
 
-  // Pagination controls
+  //pagination 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -167,7 +166,7 @@ const EmployeeManagement = () => {
         </button>
       </div>
 
-      {/* Success/Error Messages */}
+      {/* alert */}
       {success && (
         <div className="alert alert-success mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -186,7 +185,7 @@ const EmployeeManagement = () => {
         </div>
       )}
 
-      {/* Employee Add/Edit Form */}
+      {/*  add edit form */}
       {showForm && (
         <div className="bg-white shadow-md rounded p-6 mb-6 border border-primary/20">
           <h2 className="text-xl font-semibold mb-4 text-primary">
@@ -204,7 +203,7 @@ const EmployeeManagement = () => {
                   placeholder="John Doe"
                   value={formData.name}
                   onChange={handleChange}
-                  className="input input-bordered w-full"
+                  className="input input-success bg-white w-full"
                   required
                 />
               </div>
@@ -219,7 +218,7 @@ const EmployeeManagement = () => {
                   placeholder="john@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="input input-bordered w-full"
+                  className="input input-success bg-white w-full"
                   required
                 />
               </div>
@@ -234,7 +233,7 @@ const EmployeeManagement = () => {
                   placeholder="+1 234 567 8900"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="input input-bordered w-full"
+                  className="input input-success bg-white w-full"
                 />
               </div>
 
@@ -248,7 +247,7 @@ const EmployeeManagement = () => {
                   placeholder="Software Engineer"
                   value={formData.designation}
                   onChange={handleChange}
-                  className="input input-bordered w-full"
+                  className="input input-success bg-white w-full"
                 />
               </div>
 
@@ -262,7 +261,7 @@ const EmployeeManagement = () => {
                   placeholder="Engineering"
                   value={formData.department}
                   onChange={handleChange}
-                  className="input input-bordered w-full"
+                  className="input input-success bg-white w-full"
                 />
               </div>
 
@@ -275,7 +274,7 @@ const EmployeeManagement = () => {
                   name="dateOfJoining"
                   value={formData.dateOfJoining}
                   onChange={handleChange}
-                  className="input input-bordered w-full"
+                  className="input input-success bg-white w-full"
                 />
               </div>
 
@@ -290,7 +289,7 @@ const EmployeeManagement = () => {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
-                    className="input input-bordered w-full"
+                    className="input input-success bg-white w-full"
                     required
                   />
                   <label className="label">
@@ -322,7 +321,7 @@ const EmployeeManagement = () => {
                 placeholder="Search employees..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="input input-bordered w-full bg-white"
+                className="input input-success bg-white w-full bg-white"
               />
             </div>
           </div>
@@ -356,7 +355,7 @@ const EmployeeManagement = () => {
             <p className="text-gray-500">No employees found</p>
             {search && (
               <p className="text-sm text-gray-400 mt-1">
-                Try adjusting your search criteria
+                Try adjusting your search
               </p>
             )}
           </div>

@@ -85,11 +85,6 @@ const Dashboard = () => {
           <div className="card bg-white shadow-lg">
             <div className="card-body p-4">
               <div className="flex items-center">
-                <div className="rounded-full bg-primary/10 p-3 mr-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-600">Total Employees</h2>
                   <p className="text-3xl font-bold text-primary">{summary.totalEmployees || 0}</p>

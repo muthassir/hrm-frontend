@@ -8,6 +8,10 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [todayStatus, setTodayStatus] = useState({ 
+    checkedIn: false, 
+    checkedOut: false 
+  });
   const limit = 10;
 
   const fetchMyAttendance = async (page = 1) => {
@@ -18,6 +22,22 @@ const Attendance = () => {
       setAttendance(res.data.data.items);
       setTotalPages(Math.ceil(res.data.data.total / limit));
       setCurrentPage(res.data.data.page);
+      
+      // Check today's status
+      const today = new Date().toISOString().split('T')[0];
+      const todayRecord = res.data.data.items.find(
+        att => att.date === today
+      );
+      
+      if (todayRecord) {
+        setTodayStatus({
+          checkedIn: !!todayRecord.checkIn?.time,
+          checkedOut: !!todayRecord.checkOut?.time
+        });
+      } else {
+        setTodayStatus({ checkedIn: false, checkedOut: false });
+      }
+      
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch attendance");
     }
@@ -29,9 +49,31 @@ const Attendance = () => {
 
   const handleCheck = async (type) => {
     setError("");
+    
+    // Prevent multiple clicks
+    if ((type === 'checkin' && todayStatus.checkedIn) || 
+        (type === 'checkout' && todayStatus.checkedOut)) {
+      setError(`Already ${type === 'checkin' ? 'checked in' : 'checked out'} today`);
+      return;
+    }
+    
+    // Checkout requires checkin first
+    if (type === 'checkout' && !todayStatus.checkedIn) {
+      setError("You need to check in first before checking out");
+      return;
+    }
+    
     try {
       setLoading(true);
-      const res = await axiosAuth.post(`${API}/api/attendance/${type}`);
+      await axiosAuth.post(`${API}/api/attendance/${type}`);
+      
+      // Update today's status
+      if (type === 'checkin') {
+        setTodayStatus(prev => ({ ...prev, checkedIn: true }));
+      } else {
+        setTodayStatus(prev => ({ ...prev, checkedOut: true }));
+      }
+      
       fetchMyAttendance(currentPage);
       alert(`${type === 'checkin' ? 'Check-in' : 'Check-out'} successful!`);
     } catch (err) {
@@ -57,20 +99,33 @@ const Attendance = () => {
       {/* Check-in/Check-out Buttons */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4 text-primary">Today's Attendance</h2>
+        
+        {/* Today's Status */}
+        <div className="mb-4 p-3 bg-blue-50 rounded">
+          <p className="text-sm text-blue-700">
+            Status: {todayStatus.checkedOut ? "Completed" : 
+                    todayStatus.checkedIn ? "Checked In" : "Not Checked In"}
+          </p>
+        </div>
+        
         <div className="flex flex-wrap gap-4">
           <button
             onClick={() => handleCheck("checkin")}
-            className="btn btn-primary btn-lg"
-            disabled={loading}
+            className={`btn btn-lg ${todayStatus.checkedIn ? 'btn-disabled' : 'btn-primary'}`}
+            disabled={loading || todayStatus.checkedIn}
           >
-            {loading ? "Processing..." : "Check In"}
+            {loading ? "Processing..." : 
+             todayStatus.checkedIn ? "Already Checked In" : "Check In"}
           </button>
+          
           <button
             onClick={() => handleCheck("checkout")}
-            className="btn btn-secondary btn-lg"
-            disabled={loading}
+            className={`btn btn-lg ${todayStatus.checkedOut ? 'btn-disabled' : 'btn-secondary'}`}
+            disabled={loading || todayStatus.checkedOut || !todayStatus.checkedIn}
           >
-            {loading ? "Processing..." : "Check Out"}
+            {loading ? "Processing..." : 
+             todayStatus.checkedOut ? "Already Checked Out" : 
+             !todayStatus.checkedIn ? "Check In First" : "Check Out"}
           </button>
         </div>
         <p className="text-sm text-gray-500 mt-2">

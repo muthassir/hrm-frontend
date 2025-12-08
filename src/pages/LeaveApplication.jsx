@@ -1,5 +1,4 @@
-// pages/LeaveApplication.js - Employee leave application
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const LeaveApplication = () => {

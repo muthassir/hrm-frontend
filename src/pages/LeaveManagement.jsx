@@ -1,5 +1,4 @@
-// pages/LeaveManagement.js - Admin leave management
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const LeaveManagement = () => {
@@ -17,25 +16,25 @@ const LeaveManagement = () => {
   const [employees, setEmployees] = useState([]);
   const limit = 10;
 
-  const fetchLeaves = async (page = 1) => {
-    setLoading(true);
-    try {
-      let url = `${API}/api/leaves/all?page=${page}&limit=${limit}`;
-      if (filters.status) url += `&status=${filters.status}`;
-      if (filters.type) url += `&type=${filters.type}`;
-      if (filters.userId) url += `&userId=${filters.userId}`;
+const fetchLeaves = async (page = 1) => {
+  setLoading(true);
+  try {
+    let url = `${API}/api/leaves/all?page=${page}&limit=${limit}`;
+    if (filters.status) url += `&status=${filters.status}`;
+    if (filters.type) url += `&type=${filters.type}`;
+    if (filters.userId) url += `&userId=${filters.userId}`;
 
-      const res = await axiosAuth.get(url);
-      setLeaves(res.data.data.items);
-      setTotalItems(res.data.data.total);
-      setTotalPages(Math.ceil(res.data.data.total / limit));
-      setCurrentPage(res.data.data.page);
-    } catch (err) {
-      console.error("Failed to fetch leaves:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await axiosAuth.get(url);
+    setLeaves(res.data.data.items);
+    setTotalItems(res.data.data.total);
+    setTotalPages(Math.ceil(res.data.data.total / limit));
+    setCurrentPage(res.data.data.page);
+  } catch (err) {
+    console.error("Failed to fetch leaves:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchEmployees = async () => {
     try {
